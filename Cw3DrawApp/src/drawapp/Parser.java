@@ -85,7 +85,7 @@ public class Parser {
 			return;
 		}
 		if (command.equals("SD")) {
-			setDimension(line.substring(2, line.length()));
+			setDimensions(line.substring(2, line.length()));
 			return;
 		}
 		if (command.equals("SG")) {
@@ -267,12 +267,13 @@ public class Parser {
 		image.drawImage(x, y, width, height, file);
 	}
 
-	private void setDimension(String args) throws ParseException {
+	private void setDimensions(String args) throws ParseException {
 		int width = -1, height = -1;
 
 		StringTokenizer tokenizer = new StringTokenizer(args);
 		width = getInteger(tokenizer);
 		height = getInteger(tokenizer);
+		
 		if ((width < 0) || (height < 0)) {
 			throw new ParseException(
 					"Invalid values for the scene dimension command.");

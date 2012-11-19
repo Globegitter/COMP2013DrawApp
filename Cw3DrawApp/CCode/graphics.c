@@ -31,6 +31,16 @@ void drawString(char* s, int x, int y)
   printf("DS %i %i @%s\n",x,y,s);
 }
 
+void drawImage(char* s, int x, int y, int width, int height)
+{
+  printf("DI %i %i %i %i @%s\n",x,y,width,height,s);
+}
+
+void setDimensions(int width, int height)
+{
+  printf("SD %i %i\n",width,height);
+}
+
 void turtleTurnLeft(int degree)
 {
   printf("TL %i\n",degree);

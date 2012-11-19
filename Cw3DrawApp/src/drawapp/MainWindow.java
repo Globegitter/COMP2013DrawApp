@@ -142,6 +142,12 @@ public class MainWindow {
 
 		return gridpane;
 	}
+	
+	public void changeSize(int width, int height) {
+		drawArea.setPrefHeight(height - 200);
+		drawArea.setPrefWidth(width);
+		messageView.setPrefWidth(width);
+	}
 
 	public ImagePanel getImagePanel() {
 		return drawArea;
@@ -157,11 +163,5 @@ public class MainWindow {
 
 	public void postMessage(String s) {
 		messageView.setText(s);
-	}
-
-	public void changeSize(int width, int height) {
-		drawArea.setPrefHeight(height - 200);
-		drawArea.setPrefWidth(width);
-		messageView.setPrefWidth(width);
 	}
 }

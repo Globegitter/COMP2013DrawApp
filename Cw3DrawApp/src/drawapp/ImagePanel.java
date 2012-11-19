@@ -171,9 +171,11 @@ public class ImagePanel extends HBox {
 	}
 
 	public void drawImage(int x, int y, int width, int height, String path) {
-		File file = new File(path);
-		Image image = new Image(file.toURI().toString());
+		Image image = new Image(new File(path).toURI().toString());
 		ImageView iv = new ImageView(image);
+		
+		iv.setX(x);
+		iv.setY(y);
 		iv.setFitWidth(width);
 		iv.setFitHeight(height);
 		iv.setSmooth(true);

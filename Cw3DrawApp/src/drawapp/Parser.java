@@ -1,4 +1,6 @@
 package drawapp;
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -14,15 +16,16 @@ public class Parser {
 	private BufferedReader reader;
 	private ImagePanel image;
 	private MainWindow frame;
-	private Stage stage = new Stage();
+	private Stage stage;
+	private Turtle turtle;
 	private int commandNr = 0;
 
-	public Parser(Reader reader, ImagePanel image, MainWindow frame,
-			Stage stage) {
+	public Parser(Reader reader, ImagePanel image, MainWindow frame, Stage stage) {
 		this.reader = new BufferedReader(reader);
 		this.image = image;
 		this.frame = frame;
 		this.stage = stage;
+		this.turtle = new Turtle();
 	}
 
 	public void parse() {
@@ -99,6 +102,20 @@ public class Parser {
 		}
 		if (command.equals("SB")) {
 			setGaussianBlur(line.substring(2, line.length()));
+			return;
+		}
+		if (command.equals("TL")) {
+			turtleTurnLeft(line.substring(2, line.length()));
+			return;
+		}
+
+		if (command.equals("TR")) {
+			turtleTurnRight(line.substring(2, line.length()));
+			return;
+		}
+
+		if (command.equals("TF")) {
+			turtleMoveForward(line.substring(2, line.length()));
 			return;
 		}
 
@@ -249,14 +266,14 @@ public class Parser {
 
 		image.drawImage(x, y, width, height, file);
 	}
-	
+
 	private void setDimension(String args) throws ParseException {
 		int width = -1, height = -1;
-		
+
 		StringTokenizer tokenizer = new StringTokenizer(args);
 		width = getInteger(tokenizer);
 		height = getInteger(tokenizer);
-		if ((width < 0) || (height < 0)){
+		if ((width < 0) || (height < 0)) {
 			throw new ParseException(
 					"Invalid values for the scene dimension command.");
 		}
@@ -321,7 +338,7 @@ public class Parser {
 		}
 		throw new ParseException("Invalid colour name");
 	}
-	
+
 	private void setGradient(String args) throws ParseException {
 		String colourStart = "";
 		String colourEnd = "";
@@ -338,29 +355,73 @@ public class Parser {
 	private void setReflection(String args) throws ParseException {
 		StringTokenizer tokenizer = new StringTokenizer(args);
 		int setEffect = getInteger(tokenizer);
-		if(setEffect == 0){
+		if (setEffect == 0) {
 			image.setReflection(false);
-		}else{
+		} else {
 			image.setReflection(true);
 		}
 	}
 
-	private void setDropShadow(String args)  throws ParseException {
+	private void setDropShadow(String args) throws ParseException {
 		StringTokenizer tokenizer = new StringTokenizer(args);
 		int setEffect = getInteger(tokenizer);
-		if(setEffect == 0){
+		if (setEffect == 0) {
 			image.setDropShadow(false);
-		}else{
+		} else {
 			image.setDropShadow(true);
 		}
 	}
-	
-	private void setGaussianBlur(String args)  throws ParseException {
+
+	private void turtleMoveForward(String args) throws ParseException {
+		int distance = -1;
+
+		StringTokenizer tokenizer = new StringTokenizer(args);
+		distance = getInteger(tokenizer);
+
+		if (distance < 0)
+			throw new ParseException(
+					"Invalid values for the draw line command.");
+
+		int startX = (int) turtle.getPosX();
+		int startY = (int) turtle.getPosY();
+		turtle.moveForward(distance);
+		int endX = (int) turtle.getPosX();
+		int endY = (int) turtle.getPosY();
+		
+		image.drawLine(startX, startY, endX, endY);
+	}
+
+	private void turtleTurnLeft(String args) throws ParseException {
+		int angle = -1;
+		
+		StringTokenizer tokenizer = new StringTokenizer(args);
+		angle = getInteger(tokenizer);
+
+		if (angle < 0)
+			throw new ParseException(
+					"Invalid values for the draw line command.");
+		turtle.turnLeft(angle);
+	}
+
+	private void turtleTurnRight(String args) throws ParseException {
+		int angle = -1;
+
+		StringTokenizer tokenizer = new StringTokenizer(args);
+		angle = getInteger(tokenizer);
+
+		if (angle < 0)
+			throw new ParseException(
+					"Invalid values for the draw line command.");
+
+		turtle.turnRight(angle);
+	}
+
+	private void setGaussianBlur(String args) throws ParseException {
 		StringTokenizer tokenizer = new StringTokenizer(args);
 		int setEffect = getInteger(tokenizer);
-		if(setEffect == 0){
+		if (setEffect == 0) {
 			image.setGaussianBlur(false);
-		}else{
+		} else {
 			image.setGaussianBlur(true);
 		}
 	}
@@ -408,12 +469,14 @@ public class Parser {
 		throw new ParseException("Invalid colour name");
 	}
 
-	private int getInteger(StringTokenizer tokenizer) throws ParseException, NumberFormatException {
+	private int getInteger(StringTokenizer tokenizer) throws ParseException,
+			NumberFormatException {
 		if (tokenizer.hasMoreTokens()) {
-			try{
+			try {
 				return Integer.parseInt(tokenizer.nextToken());
-			}catch(NumberFormatException e){
-				throw new NumberFormatException("Integer value not proper format.");
+			} catch (NumberFormatException e) {
+				throw new NumberFormatException(
+						"Integer value not proper format.");
 			}
 		} else {
 			throw new ParseException("Missing Integer value");
@@ -442,12 +505,12 @@ public class Parser {
 					}
 				} catch (ParseException e) {
 					frame.postMessage("Parse Exception: " + e.getMessage());
-				} catch(NumberFormatException e){
+				} catch (NumberFormatException e) {
 					frame.postMessage("Parse Exception: " + e.getMessage());
 				}
 			}
 		});
-		
+
 		complete.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				try {
@@ -462,7 +525,7 @@ public class Parser {
 					}
 				} catch (ParseException e) {
 					frame.postMessage("Parse Exception: " + e.getMessage());
-				} catch(NumberFormatException e){
+				} catch (NumberFormatException e) {
 					frame.postMessage("Parse Exception: " + e.getMessage());
 				}
 			}

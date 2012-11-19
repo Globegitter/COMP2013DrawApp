@@ -20,9 +20,9 @@ public class Main extends Application {
 	public void start(Stage stage) throws IOException {
 		final MainWindow main = new MainWindow(stage);
 		ImagePanel imagePanel = main.getImagePanel();
-		InputStream inputFile = new FileInputStream("C:\\Users\\Markus\\EclipseWorkspace\\Java\\Year2\\Cw3DrawAppTina\\test.out");		
-		InputStream is = new ByteArrayInputStream( "TL 30\nTF 100".getBytes() );
-		Reader reader = new InputStreamReader(is);//System.in);
+		InputStream inputFile = new FileInputStream(getClass().getResource("test.out").toExternalForm().substring(6));		
+		//InputStream is = new ByteArrayInputStream( "TL 30\nTF 100".getBytes() );
+		Reader reader = new InputStreamReader(inputFile);//System.in);
 		Parser parser = new Parser(reader, imagePanel, main, stage);
 		Button nextStep = main.nextStepButton();
 		Button finishDrawing = main.finishDrawingButton();

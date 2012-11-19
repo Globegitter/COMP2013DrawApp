@@ -1,95 +1,167 @@
 package drawapp;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.GroupBuilder;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBuilder;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextAreaBuilder;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.ToolBarBuilder;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.FlowPaneBuilder;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.Region;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 
+public class MainWindow {
+	public static final int SCENEWIDTH = 560, SCENEHEIGHT = 500;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+	private ImagePanel drawArea;
+	private TextArea messageView;
+	private Button exit;
+	private Button nextStep;
+	private Button finishDrawing;
+	private Button saveImage;
 
-public class MainWindow extends JFrame implements ActionListener
-{
-  public static final int DEFAULT_WIDTH = 500;
-  public static final int DEFAULT_HEIGHT = 300;
+	public MainWindow(Stage stage) {
+		this(stage, SCENEWIDTH, SCENEHEIGHT);
+	}
 
-  private int width;
-  private int height;
+	public MainWindow(final Stage stage, int width, int height) {
+		stage.setTitle("DrawApp");
+		final Parent root = GroupBuilder.create()
+				.children(
+						buildGUI(stage, width, height)
+				)
+				.build();
+		Scene scene = new Scene(root, width, height);
+		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		stage.setScene(scene);
+	}
 
-  private ImagePanel imagePanel;
-  private JTextArea messageView;
-  private JButton quitButton;
+	private GridPane buildGUI(final Stage stage, final int width, final int height) {
+		GridPane gridpane = new GridPane();
+		
+		messageView = TextAreaBuilder.create()
+				.wrapText(true)
+				.prefRowCount(6)
+				.prefWidth(width)
+				.editable(false)
+				.build();
+		
+		drawArea = new ImagePanel(width, height);
+		drawArea.setPrefWidth(width);
+		drawArea.setPrefHeight(height-200);
+		
+		nextStep = ButtonBuilder.create()
+				.text("Next Step")
+				.styleClass("first")
+				.build();
+		
+		finishDrawing = ButtonBuilder.create()
+				.text("Finish Drawing")
+				.build();
+		
+		exit = ButtonBuilder.create()
+				.text("Exit")
+				.styleClass("last")
+				.onAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						Platform.exit();
+					}
+				})
+				.build();
+		
+		saveImage = ButtonBuilder.create()
+				.text("Save Image...")
+				.onAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						try {
+				            FileChooser imageLocation = new FileChooser();
+				            
+				            FileChooser.ExtensionFilter pngFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+				            imageLocation.getExtensionFilters().add(pngFilter);
+				            
+				            File file = imageLocation.showSaveDialog(stage);
+				            if(file != null){
+					            if(!file.toString().endsWith(".png")){
+					            	file = new File(file.getAbsolutePath().toString() + ".png");
+					            }
+					            ImageIO.write(
+										SwingFXUtils.fromFXImage(
+												drawArea.snapshot(null, null), null),
+										"png", file);
+				            }
+						} catch (IOException ex) {
+							postMessage("Saving Failed. Please choose another file");
+						}
+					}
+				})
+				.build();
+		
+		Region spacer = new Region();
+        spacer.getStyleClass().setAll("spacer");
+        
+        ToolBar bottomButtons = ToolBarBuilder.create()
+        		.items(
+        				spacer,
+        				HBoxBuilder.create()
+        				.children(
+        						nextStep,
+        						finishDrawing,
+        						saveImage,
+        						exit
+        						)
+        				.padding(new Insets(5, 0, 5, 0))
+        				.styleClass("segmented-button-bar")
+        				.build()
+        				)
+        		.build();
+		
+		gridpane.add(drawArea, 0, 0);
+		gridpane.add(messageView, 0, 1);
+		gridpane.add(bottomButtons, 0, 2);
 
-  public MainWindow()
-  {
-    this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-  }
+		return gridpane;
+	}
 
-  public MainWindow(int width, int height)
-  {
-    super("Draw App");
-    this.width = width;
-    this.height = height;
-    buildGUI();
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.pack();
-    this.setVisible(true);
-  }
+	public ImagePanel getImagePanel() {
+		return drawArea;
+	}
 
-  private void buildGUI()
-  {
-    JPanel backPanel = new JPanel();
-    backPanel.setLayout(new BorderLayout());
-    imagePanel = new ImagePanel(width, height);
-    backPanel.add(imagePanel,BorderLayout.CENTER);
+	public Button nextStepButton() {
+		return nextStep;
+	}
 
-    messageView = new JTextArea();
-    messageView.setRows(6);
-    messageView.setEditable(false);
-    JScrollPane scrollPane = new JScrollPane(messageView);
+	public Button finishDrawingButton() {
+		return finishDrawing;
+	}
 
-    JPanel lowerPanel = new JPanel();
-    lowerPanel.setLayout(new BorderLayout());
-    lowerPanel.add(scrollPane,BorderLayout.CENTER);
+	public void postMessage(String s) {
+		messageView.setText(s);
+	}
 
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new FlowLayout());
-    quitButton = new JButton("Close Window");
-    buttonPanel.add(quitButton);
-    quitButton.addActionListener(this);
-    lowerPanel.add(buttonPanel,BorderLayout.SOUTH);
-
-    backPanel.add(lowerPanel,BorderLayout.SOUTH);
-    this.add(backPanel);
-  }
-
-  public ImagePanel getImagePanel()
-  {
-    return imagePanel;
-  }
-
-  public void postMessage(final String s)
-  {
-     SwingUtilities.invokeLater(
-        new Runnable()
-        {
-          public void run()
-          {
-            messageView.append(s);
-            messageView.repaint();
-          }
-        });
-  }
-
-  public void actionPerformed(ActionEvent actionEvent)
-  {
-    setVisible(false);
-    dispose();
-    System.exit(0);
-  }
+	public void changeSize(int width, int height) {
+		drawArea.setPrefHeight(height - 200);
+		drawArea.setPrefWidth(width);
+		messageView.setPrefWidth(width);
+	}
 }

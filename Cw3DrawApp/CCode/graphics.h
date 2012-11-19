@@ -7,5 +7,8 @@ void drawOval(int,int,int,int);
 void drawArc(int,int,int,int,int,int);
 void fillRect(int,int,int,int);
 void drawString(char*,int,int);
+void turtleTurnLeft(int degree);
+void tutleTurnRight(int degree);
+void turtleMoveForward(int steps);
 
 void setColour(colour);

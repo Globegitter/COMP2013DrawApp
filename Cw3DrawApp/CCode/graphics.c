@@ -31,6 +31,21 @@ void drawString(char* s, int x, int y)
   printf("DS %i %i @%s\n",x,y,s);
 }
 
+void turtleTurnLeft(int degree)
+{
+  printf("TL %i\n",degree);
+}
+
+void tutleTurnRight(int degree)
+{
+  printf("TR %i %i @%s\n",degree);
+}
+
+void turtleMoveForward(int steps)
+{
+  printf("TF %i %i @%s\n",steps);
+}
+
 void setColour(colour c)
 {
   char* colourName;

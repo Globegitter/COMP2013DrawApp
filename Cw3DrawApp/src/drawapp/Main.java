@@ -1,25 +1,33 @@
 package drawapp;
 
-
-import javax.swing.SwingUtilities;
-import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
+import javafx.application.Application;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
-public class Main {
+public class Main extends Application {
+	
 	public static void main(String[] args) {
-		final MainWindow main = new MainWindow();
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				ImagePanel imagePanel = main.getImagePanel();
-				Reader reader = new InputStreamReader(System.in);
-				Parser parser = new Parser(reader, imagePanel, main);
-				parser.parse();
-				imagePanel.repaint();
-			}
-		});
-
+		Application.launch(args);
 	}
+
+	@Override
+	public void start(Stage stage) throws IOException {
+		final MainWindow main = new MainWindow(stage);
+		ImagePanel imagePanel = main.getImagePanel();
+		InputStream inputFile = new FileInputStream("C:\\Users\\Markus\\EclipseWorkspace\\Java\\Year2\\Cw3DrawAppTina\\test.out");
+		InputStream is = new ByteArrayInputStream( "DO 200 200 50 70".getBytes() );
+		Reader reader = new InputStreamReader(is);//System.in);
+		Parser parser = new Parser(reader, imagePanel, main, stage);
+		Button nextStep = main.nextStepButton();
+		Button finishDrawing = main.finishDrawingButton();
+		parser.parseButton(nextStep, finishDrawing);
+		stage.show();
+	}
+
 }

@@ -1,9 +1,10 @@
 package drawapp;
+
 import java.io.File;
 import javafx.scene.Group;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.effect.Reflection;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -13,14 +14,14 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.LinearGradientBuilder;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Arc;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 public class ImagePanel extends HBox {
-	private Group graphics = new Group();
+  private Group graphics = new Group();
 	private Paint colour;
 	private Boolean dropShadow;
 	private Boolean reflection;
